@@ -1,0 +1,4 @@
+
+numpy==1.19.2
+filepattern==1.4.4
+opencv-python==4.5.1.48
