@@ -255,30 +255,6 @@ def run(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, mo
        output = app.predict(X_test)
        save_data(inpDir, output, size, filePattern1, out_path)
        logger.info("Segmentation complete.")
-#       ind = 0
-#       fp = filepattern.FilePattern(inpDir,filePattern)
-#       for fP in fp():
-#          for PATH in fP:
-#             with BioReader(PATH.get("file")) as br:
-#                print(PATH.get("file"))
-#                with BioWriter(out_path.joinpath(PATH.get("file").name),metadata = br.metadata) as bw:
-#                   bw.dtype = np.uint8
-#                   for y in range(0,br.Y,tile_size):
-#                      for x in range(0,br.X,tile_size):
-#                          x_min = max(0, x - tile_overlap)
-#                          x_max = min(br.X, x + tile_size + tile_overlap)
-#                          y_min = max(0, y - tile_overlap)
-#                          y_max = min(br.Y, y + tile_size + tile_overlap)
-
-#                          im = np.squeeze(output[ind])
-#                          x_overlap, x_min, x_max = x - x_min, x, min(br.X, x + tile_size)
-#                          y_overlap, y_min, y_max = y - y_min, y, min(br.Y, y + tile_size)
-#                          final = im[y_overlap:y_max - y_min + y_overlap, x_overlap:x_max - x_min+ x_overlap]
-#                          final = final.astype(np.uint8)
-#                          output_image_5channel=np.zeros((final.shape[0], final.shape[1],1,1,1),dtype=np.uint8)
-#                          output_image_5channel[:,:,0,0,0]=final
-#                          bw[y_min:y_max, x_min:x_max,0:1,0,0] = output_image_5channel
-#                          ind+=1
-
+    
     elif model == "BYOM":
        predict_(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, model, out_path)
