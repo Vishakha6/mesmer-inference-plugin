@@ -27,7 +27,7 @@ logger = logging.getLogger("segmenting")
 logger.setLevel(logging.INFO)
 
 tile_overlap = 64
-tile_size = 1024
+tile_size = 2048
 
 def padding(image, shape_1, shape_2, second, size):
     
@@ -109,8 +109,18 @@ def get_data(rootdir, filePattern1, filePattern2, size, model):
                           padded_img,pad_dimensions=padding(tile, shape_1, shape_2, second, size)
 
                           if model == "mesmerNuclear":
-                             im1 = np.zeros((padded_img.shape[0], padded_img.shape[1]))
-                             image = np.stack((padded_img, im1), axis=-1)
+                             if filePattern2 is not None:
+                                 string = PATH.get("file").name
+                                 if "*" in filePattern1:
+                                    filePattern1 = filePattern1.split("*")[1]
+                                 name = string.replace(filePattern1, filePattern2)
+                                 with BioReader(Path(str(rootdir)+"/"+name)) as br_whole:
+                                     tile_whole = np.squeeze(br_whole[y_min:y_max, x_min:x_max, z:z + 1, 0, 0])
+                                     padded_img_cyto,pad_dimensions_cyto=padding(tile_whole, shape_1, shape_2, second, size)
+                                     image = np.stack((padded_img, padded_img_cyto), axis=-1)
+                             else:
+                                 im1 = np.zeros((padded_img.shape[0], padded_img.shape[1]))
+                                 image = np.stack((padded_img, im1), axis=-1)
                           elif model == "mesmerWholeCell":
                              string = PATH.get("file").name
                              if "*" in filePattern1:
@@ -118,14 +128,14 @@ def get_data(rootdir, filePattern1, filePattern2, size, model):
                              name = string.replace(filePattern1, filePattern2)
                              with BioReader(Path(str(rootdir)+"/"+name)) as br_whole:
                                  tile_whole = np.squeeze(br_whole[y_min:y_max, x_min:x_max, z:z + 1, 0, 0])
-                                 padded_img_whole,pad_dimensions_whole=padding(tile_whole, shape_1, shape_2, second, size)
-                                 image = np.stack((padded_img_whole, padded_img), axis=-1)
+                                 padded_img_nuclear,pad_dimensions_nuclear=padding(tile_whole, shape_1, shape_2, second, size)
+                                 image = np.stack((padded_img_nuclear, padded_img), axis=-1)
                           else:
                              image = np.expand_dims(padded_img, axis=-1)
                           data.append(image)
     return data
 
-def save_data(rootdir, y_pred, size, filePattern, out_path):
+def save_data(rootdir, y_pred, size, filePattern, out_path, model):
     inpDir = Path(rootdir)
     out_path = Path(out_path) 
     ind = 0
@@ -158,11 +168,15 @@ def save_data(rootdir, y_pred, size, filePattern, out_path):
 
                                 out_img=np.zeros((padded_img.shape[0],padded_img.shape[1]))
 
-                                for i in range(int(padded_img.shape[0]/size)):
-                                    for j in range(int(padded_img.shape[1]/size)):
-                                        new_img = np.squeeze(y_pred[ind])
-                                        out_img[i*size:(i+1)*size,j*size:(j+1)*size]=new_img
-                                        ind+=1
+                                if model == "BYOM":
+                                    for i in range(int(padded_img.shape[0]/size)):
+                                        for j in range(int(padded_img.shape[1]/size)):
+                                            new_img = np.squeeze(y_pred[ind])
+                                            out_img[i*size:(i+1)*size,j*size:(j+1)*size]=new_img
+                                            ind+=1
+                                else:
+                                    out_img = np.squeeze(y_pred[ind])
+                                    ind+=1
 
                                 top_pad,bottom_pad,left_pad,right_pad=pad_dimensions
                                 output = out_img[top_pad:out_img.shape[0]-bottom_pad,left_pad:out_img.shape[1]-right_pad]
@@ -231,7 +245,7 @@ def predict_(xtest_path, ytest_path, size, model_path, filePattern1, filePattern
     for i in range(masks.shape[0]):
        y_pred.append(masks[i,...])
 
-    save_data(Path(xtest_path), y_pred, size, filePattern1, out_path)
+    save_data(Path(xtest_path), y_pred, size, filePattern1, out_path, model)
     logger.info("Segmentation complete.")
 
 
@@ -245,16 +259,21 @@ def run(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, mo
     if model in ["mesmerNuclear", "nuclear", "cytoplasm","mesmerWholeCell"]:
        x_test = get_data(inpDir, filePattern1, filePattern2, size, model)
        X_test = np.asarray(x_test)
-       if model == "mesmerNuclear" or "mesmerWholeCell":
+       if model == "mesmerNuclear":
           app = Mesmer()
+          output = app.predict(X_test, compartment="nuclear")
+       elif model == "mesmerWholeCell":
+          app = Mesmer()
+          output = app.predict(X_test, compartment="whole-cell")
        elif model == "nuclear":
           app = NuclearSegmentation()
+          output = app.predict(X_test)
        elif model == "cytoplasm":
           app = CytoplasmSegmentation() 
+          output = app.predict(X_test)
 
-       output = app.predict(X_test)
-       save_data(inpDir, output, size, filePattern1, out_path)
+       save_data(inpDir, output, size, filePattern1, out_path, model)
        logger.info("Segmentation complete.")
-    
+
     elif model == "BYOM":
        predict_(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, model, out_path)
