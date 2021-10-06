@@ -37,6 +37,7 @@ This plugin takes one input argument and one output argument:
 | `--tilesize` | Tile size to be processed by the model. Default is 256. | Input | number |
 | `--modelPath` | Model path for inference. Optional. | Input | genericData |
 | `--model` | Model - mesmerNuclear, mesmerWholeCell, BYOM | Input | enum |
-| `--filePattern` | Filename pattern to filter data. | Input | string |
+| `--filePatternTest` | Filename pattern for Nuclear data. | Input | string |
+| `--filePatternWholeCell` | Filename pattern for Membrane data. Optional.| Input | string |
 | `--outDir` | Output collection | Output | collection |
 
