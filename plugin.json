@@ -1,6 +1,6 @@
 {
     "name": "Mesmer Inference",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "title": "Mesmer Inference",
     "description": "WIPP plugin to run inference using MESMER.",
     "author": "Vishakha Goyal (vishakha.goyal@nih.gov)",
@@ -8,7 +8,7 @@
     "repository": "https://github.com/labshare/polus-plugins",
     "website": "https://ncats.nih.gov/preclinical/core/informatics",
     "citation": "",
-    "containerId": "polusai/mesmer-inference-plugin:0.0.3",
+    "containerId": "polusai/mesmer-inference-plugin:0.0.4",
     "inputs": [
       {
         "name": "testingImages",
@@ -20,7 +20,7 @@
         "name": "testingLabels",
         "type": "collection",
         "description": "Input image collection to be processed by this plugin.",
-        "required": true
+        "required": false
       },
       {
         "name": "modelPath",

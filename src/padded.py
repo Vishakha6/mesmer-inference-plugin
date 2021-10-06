@@ -274,6 +274,6 @@ def run(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, mo
 
        save_data(inpDir, output, size, filePattern1, out_path, model)
        logger.info("Segmentation complete.")
-
+#       print(os.path.expanduser(os.path.join('~', '.keras', 'models')))
     elif model == "BYOM":
        predict_(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, model, out_path)

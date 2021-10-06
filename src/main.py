@@ -17,7 +17,7 @@ if __name__=="__main__":
     parser.add_argument('--testingImages', dest='testingImages', type=str,
                         help='Input testing image collection to be processed by this plugin', required=True)
     parser.add_argument('--testingLabels', dest='testingLabels', type=str,
-                        help='Input testing label collection to be processed by this plugin', required=True)
+                        help='Input testing label collection to be processed by this plugin', required=False)
     parser.add_argument('--tilesize', dest='tilesize', type=str, default="256",
                         help='Input image tile size. Default 256x256.', required=False)
     parser.add_argument('--modelPath', dest='modelPath', type=str,
@@ -44,9 +44,6 @@ if __name__=="__main__":
     logger.info('testingImages = {}'.format(testingImages))
 
     testingLabels = args.testingLabels
-    if (Path.is_dir(Path(args.testingLabels).joinpath('images'))):
-        # switch to images folder if present
-        fpath = str(Path(args.testingLabels).joinpath('images').absolute())
     logger.info('testingLabels = {}'.format(testingLabels))
 
     modelPath = args.modelPath
