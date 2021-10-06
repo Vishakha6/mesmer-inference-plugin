@@ -1,33 +1,34 @@
-FROM labshare/polus-bfio-util:2.0.6-tensorflow
+# Get Linux
+FROM tensorflow/tensorflow:2.5.1-gpu
 
-COPY VERSION /
+# Polus platform file extension
+ENV POLUS_EXT=".ome.tif"
 
-ARG EXEC_DIR="/opt/executables"
+# Container log level
+ENV POLUS_LOG="INFO"
 
-#Create folders
-RUN mkdir -p ${EXEC_DIR}
+# Data and code directories
+ENV EXEC_DIR="/opt/executables"
+ENV DATA_DIR="/data"
 
-#Copy executable
+RUN mkdir ${EXEC_DIR} && \
+    mkdir ${DATA_DIR}}
+
+RUN pip3 install --upgrade pip --no-cache-dir
+
+# Install bfio and requirements
+RUN pip3 install bfio[all]==2.1.9 --no-cache-dir --no-dependencies && \
+    rm -rf /usr/local/lib/python3.6/site-packages/bfio/jars
+
+COPY VERSION ${EXEC_DIR}
 COPY src ${EXEC_DIR}/
 
-RUN pip install --upgrade setuptools
 
+RUN apt-get install -y libgl1-mesa-glx
 
-# Install open JDK 8
-RUN apt-get update && apt-get -y upgrade && \
-    apt-get -y install openjdk-8-jdk
+RUN pip3 install -r ${EXEC_DIR}/requirements.txt --no-cache-dir
+    
+WORKDIR ${EXEC_DIR}
 
-RUN apt-get update && \
-    pip install --upgrade cython numpy deepcell
-
-RUN pip install -r ${EXEC_DIR}/requirements.txt --no-cache-dir
-
-# RUN apt-get update
-RUN apt-get install -y software-properties-common && \
-    apt-get install -y gnupg && \
-    apt-get install -y wget && \
-    apt install -y build-essential && \
-    apt-get install -y doxygen libssl-dev git libgl1-mesa-glx build-essential libssl-dev libffi-dev python-dev
-
-
-ENTRYPOINT [ "python3", "main.py" ]
+# Default command. Additional arguments are provided through the command line
+ENTRYPOINT ["python3", "main.py"]
