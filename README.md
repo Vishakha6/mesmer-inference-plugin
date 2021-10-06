@@ -35,8 +35,8 @@ This plugin takes one input argument and one output argument:
 | `--testingImages` | Intensity images to be processed by this plugin. | Input | collection |
 | `--testingLabels` | Label images to be processed by this plugin. | Input | collection |
 | `--tilesize` | Tile size to be processed by the model. Default is 256. | Input | number |
-| `--modelPath` | Model path for inference. | Input | genericData |
-| `--model` | Model | Input | string |
+| `--modelPath` | Model path for inference. Optional. | Input | genericData |
+| `--model` | Model - mesmerNuclear, mesmerWholeCell | Input | enum |
 | `--filePattern` | Filename pattern to filter data. | Input | string |
 | `--outDir` | Output collection | Output | collection |
 
