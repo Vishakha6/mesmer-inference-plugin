@@ -17,6 +17,8 @@ import filepattern
 from timeit import default_timer
 from deepcell.applications import Mesmer, NuclearSegmentation, CytoplasmSegmentation
 
+import tensorflow as tf
+
 from deepcell_toolbox.deep_watershed import deep_watershed
 import logging
 import math
@@ -260,10 +262,16 @@ def run(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, mo
        x_test = get_data(inpDir, filePattern1, filePattern2, size, model)
        X_test = np.asarray(x_test)
        if model == "mesmerNuclear":
-          app = Mesmer()
+          MODEL_DIR = os.path.expanduser(os.path.join('~', '.keras', 'models'))
+          modelPath = os.path.join(MODEL_DIR, "MultiplexSegmentation")
+          modelM = tf.keras.models.load_model(modelPath)
+          app = Mesmer(model=modelM)
           output = app.predict(X_test, compartment="nuclear")
        elif model == "mesmerWholeCell":
-          app = Mesmer()
+          MODEL_DIR = os.path.expanduser(os.path.join('~', '.keras', 'models'))
+          modelPath = os.path.join(MODEL_DIR, "MultiplexSegmentation")
+          modelM = tf.keras.models.load_model(modelPath)
+          app = Mesmer(model=modelM)
           output = app.predict(X_test, compartment="whole-cell")
        elif model == "nuclear":
           app = NuclearSegmentation()
@@ -274,6 +282,6 @@ def run(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, mo
 
        save_data(inpDir, output, size, filePattern1, out_path, model)
        logger.info("Segmentation complete.")
-#       print(os.path.expanduser(os.path.join('~', '.keras', 'models')))
+
     elif model == "BYOM":
        predict_(xtest_path, ytest_path, size, model_path, filePattern1, filePattern2, model, out_path)
