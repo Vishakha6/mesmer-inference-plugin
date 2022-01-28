@@ -34,10 +34,10 @@ This plugin takes one input argument and one output argument:
 |---------------|-------------------------|--------|--------|
 | `--testingImages` | Intensity images to be processed by this plugin. | Input | collection |
 | `--testingLabels` | Label images to be processed by this plugin. Optional. | Input | collection |
-| `--tilesize` | Tile size to be processed by the model. Default is 256. | Input | number |
+| `--tilesize` | Tile size to be processed by the model. Default is 256. Optional. | Input | number |
 | `--modelPath` | Model path for inference. Optional. | Input | genericData |
 | `--model` | Model - mesmerNuclear, mesmerWholeCell, BYOM | Input | enum |
-| `--filePatternTest` | Filename pattern for Nuclear data. | Input | string |
-| `--filePatternWholeCell` | Filename pattern for Membrane data. Optional.| Input | string |
+| `--filePatternTest` | Filename pattern for test data. | Input | string |
+| `--filePatternWholeCell` | Filename pattern for nuclear images for whole cell segmentation. Optional.| Input | string |
 | `--outDir` | Output collection | Output | collection |
 
